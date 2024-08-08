@@ -80,8 +80,6 @@ class ScrapeController extends Controller {
 
     $parsedContent->clear(); // clean up resources
 
-
-
   }
 
 
@@ -89,7 +87,7 @@ class ScrapeController extends Controller {
   public function getParsedContent($url) {
     $curl = curl_init(); // initialize a cURL session
 
-    curl_setopt_array($curl, array(
+    curl_setopt_array($curl, array( // set curl options
       CURLOPT_URL => "$url",
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_FOLLOWLOCATION => true,
@@ -107,26 +105,25 @@ class ScrapeController extends Controller {
 
     curl_close($curl); // close cURL session
 
-    return HtmlDomParser::str_get_html($htmlContent); // parse the html document into nodes
+    return HtmlDomParser::str_get_html($htmlContent); // return parsed html document
   }
-
 
 
   public function getPageInfo($htmlContent) {
 
     $searchUrlTerm = "/class=\"page-numbers\"\s+href=\".*?\"/i"; // find all instance of '"class="page-numbers" href="https://www.scrapingcourse.com/ecommerce/page/12/"'
     preg_match_all($searchUrlTerm, $htmlContent, $matches); // store it in $matches
-    $matches = $matches[0]; // convert $matches into array from associative
+    $matches = $matches[0]; // convert $matches into an array from associative
 
     $rscPathPattern = "/https:.*?page\/\d+/i"; // find all instance of 'https://www.scrapingcourse.com/ecommerce/page/<n>/'
-    preg_match_all($rscPathPattern, end($matches), $resourcePath);
-    $resourcePath = $resourcePath[0];
+    preg_match_all($rscPathPattern, end($matches), $resourcePath); // store it in $resourcePath
+    $resourcePath = $resourcePath[0]; // convert $resourcePath into an array from associative
 
     //print_r($matches);
     //print_r(end($matches));
     //exit;
 
-    return [
+    return [ // return the number of sites and its resource path
       "numOfPages" => basename($resourcePath[0]),
       "resourcePath" => dirname($resourcePath[0])
     ];

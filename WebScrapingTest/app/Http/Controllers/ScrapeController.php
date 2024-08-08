@@ -9,22 +9,21 @@ use KubAT\PhpSimple\HtmlDomParser;
 
 class ScrapeController extends Controller {
 
-  public function scraper() {
-    echo "cnbkjfdfjkghkdfghfdjk";
-  }
-
+  public $productList = [];
 
   public function scrape(Request $request) {
     $url = $request->get('url');
     //dd($url);
 
-    $parsedContent = $this->getParsedContent($url);
+    echo "extracting data from $url";
+
+    $parsedContent = $this->getParsedContent($url); // parse the html document into nodes
     //dd($parsedContent);
 
-    $pageInfo = (object)$this->getPageInfo($parsedContent);
+    $pageInfo = (object)$this->getPageInfo($parsedContent); // get page count & resource path
     //dd($pageInfo);
 
-    $productList = array();
+    echo '<div><i class="fa fa-refresh fa-spin" aria-hidden="true"></i></div>';
 
     for ($i=1; $i <= $pageInfo->numOfPages; $i++) {
       $endPoint = "$pageInfo->resourcePath/$i";
@@ -36,52 +35,54 @@ class ScrapeController extends Controller {
       $products = $parsedContent->find(".product");
       //dd($products);
 
-      //$productList = array();
+      /*********** start scraping here ***********/
 
       foreach($products as $product) {
+
+        $productSku = $product->find("a[data-product_sku]", 0);
+        $productId = $product->find("a[data-product_id]", 0);
         $productName = $product->find(".woocommerce-loop-product__title", 0);
         $productPrice = $product->find("span.price", 0);
+        $productUrl = $product->find("a[href]", 0);
+
 
         $productInfo = [
+          "SKU" => $productSku->getAttribute("data-product_sku"),
+          "Product ID" => $productId->getAttribute("data-product_id"),
           "Name" => $productName->plaintext,
-          "Price" => $productPrice->plaintext
+          "Price" => $productPrice->plaintext,
+          "URL" => $productUrl->getAttribute("href")
         ];
         //dd($productInfo);
 
         $productList[] = $productInfo;
       }
       /*********** end scraping here ***********/
-
-
-      dd($productList);
-
-
-
+      //dd($productList);
     }
 
-    // define the path to the CSV file
-    $csvFilePath = "products.csv";
 
-    // open the CSV file for writing
-    $file = fopen($csvFilePath, "w");
 
-    // write the header row to the CSV file
-    fputcsv($file, array_keys($productList[0]));
 
-    // write each product's data to the CSV file
-    foreach ($productList as $product) {
+    $csvFilePath = "products.tsv"; // file in tsv format
+
+    $file = fopen($csvFilePath, "w"); // open the file for writing
+
+    fputcsv($file, array_keys($productList[0])); // write the header into the file
+
+    foreach ($productList as $product) { // persist the products into the file
       fputcsv($file, $product);
     }
 
-    fclose($file); // close the CSV file
-    echo "CSV file created successfully: $csvFilePath";
+    fclose($file); // close the file
+
+    echo "TSV file created successfully: $csvFilePath";
 
     $parsedContent->clear(); // clean up resources
 
 
 
   }
-
 
 
 
@@ -111,13 +112,10 @@ class ScrapeController extends Controller {
 
 
 
-
-  function getPageInfo($htmlContent) {
-    //$searchPageTerm = "/class=\"page-numbers\"/i";
-    //$numOfPages = preg_match_all($searchPageTerm, $htmlContent);
+  public function getPageInfo($htmlContent) {
 
     $searchUrlTerm = "/class=\"page-numbers\"\s+href=\".*?\"/i"; // find all instance of '"class="page-numbers" href="https://www.scrapingcourse.com/ecommerce/page/12/"'
-    preg_match_all($searchUrlTerm, $htmlContent, $matches); // store it in $matched
+    preg_match_all($searchUrlTerm, $htmlContent, $matches); // store it in $matches
     $matches = $matches[0]; // convert $matches into array from associative
 
     $rscPathPattern = "/https:.*?page\/\d+/i"; // find all instance of 'https://www.scrapingcourse.com/ecommerce/page/<n>/'
@@ -136,7 +134,9 @@ class ScrapeController extends Controller {
   }
 
 
-
+  public function scraper() {
+    echo "cnbkjfdfjkghkdfghfdjk";
+  }
 
 
 

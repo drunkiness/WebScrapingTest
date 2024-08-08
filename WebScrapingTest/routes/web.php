@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/scraper', [ScrapeController::class, 'scraper']);
+//Route::get('/scraper', [ScrapeController::class, 'scraper']);
 Route::get('/scrape', [ScrapeController::class, 'scrape']);

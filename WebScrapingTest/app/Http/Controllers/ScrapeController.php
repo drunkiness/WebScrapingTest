@@ -58,10 +58,10 @@ class ScrapeController extends Controller {
         $productList[] = $productInfo;
       }
       /*********** end scraping here ***********/
-      //dd($productList);
+
     }
 
-
+    //dd($productList);
 
 
     $csvFilePath = "products.tsv"; // file in tsv format

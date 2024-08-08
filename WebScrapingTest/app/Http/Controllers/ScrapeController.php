@@ -23,9 +23,8 @@ class ScrapeController extends Controller {
     $pageInfo = (object)$this->getPageInfo($parsedContent); // get page count & resource path
     //dd($pageInfo);
 
-    echo '<div><i class="fa fa-refresh fa-spin" aria-hidden="true"></i></div>';
 
-    for ($i=1; $i <= $pageInfo->numOfPages; $i++) {
+    for ($i=1; $i <= $pageInfo->numOfPages; $i++) { // traversing through the pages
       $endPoint = "$pageInfo->resourcePath/$i";
       //dd($endPoint);
 

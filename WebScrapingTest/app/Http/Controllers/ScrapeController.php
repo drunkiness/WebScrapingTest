@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Nette\Utils\Arrays;
 use KubAT\PhpSimple\HtmlDomParser;
+use Illuminate\Support\Facades\File;
+use App\Http\Controllers\regex;
+
 
 class ScrapeController extends Controller {
 
@@ -15,7 +18,7 @@ class ScrapeController extends Controller {
     $url = $request->get('url');
     //dd($url);
 
-    echo "extracting data from $url";
+    echo "extracting data from $url ...\n";
 
     $parsedContent = $this->getParsedContent($url); // parse the html document into nodes
     //dd($parsedContent);

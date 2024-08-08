@@ -1,0 +1,4 @@
+{
+  "searchUrlTerm": "\/class=\\\"page-numbers\\\"\\s+href=\\\".*?\\\"\/i",
+  "rscPathPattern": "\/https:.*?page\\\/\\d+\/i"
+}
